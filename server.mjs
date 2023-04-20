@@ -4,9 +4,9 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 
 import createGame from './repo/game/createGame.mjs';
-import addUser from './repo/game/addUser.mjs';
 import { authMiddelware } from './middleware/auth.mjs';
 import UserService from './services/users.mjs';
+import GameService from './services/game.mjs';
 
 const PORT = 4008;
 
@@ -16,14 +16,14 @@ app.use(cors(), bodyParser.json());
 app.use(authMiddelware);
 
 app.post('/game', async (req, res) => {
-  console.log(req.userData);
   const { rows } = await createGame(req.userData.id);
   res.send(rows[0]);
 })
 
-app.post('/game/:id/user', async (req, res) => {
+app.put('/game/:id/user/', async (req, res) => {
   try {
-    await addUser(req.params.id, req.body.userId);
+    const gameService = new GameService();
+    await gameService.addUser(req.params.id, req.userData.id);
     res.send({
       message: 'User successfully added to game'
     });
