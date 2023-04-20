@@ -12,9 +12,15 @@ export function authMiddelware(req, res, next) {
   }
 
   try {
-    req.userData = jwt.decode(token);
+    const userData = jwt.verify(token, 'my_top_secret_key');
+    if (userData.exp < Math.round(Date.now() / 1000)) {
+      return res.send({
+        message: 'Token has expired'
+      });
+    }
+    req.userData = userData;
     next();
-  } catch {
+  } catch (e) {
     return res.send({
       message: 'Something wrong with the token'
     });

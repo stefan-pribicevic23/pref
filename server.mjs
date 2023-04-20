@@ -6,7 +6,7 @@ import bodyParser from 'body-parser';
 import createGame from './repo/game/createGame.mjs';
 import addUser from './repo/game/addUser.mjs';
 import { authMiddelware } from './middleware/auth.mjs';
-import Users from './services/users.mjs';
+import UserService from './services/users.mjs';
 
 const PORT = 4008;
 
@@ -16,8 +16,8 @@ app.use(cors(), bodyParser.json());
 app.use(authMiddelware);
 
 app.post('/game', async (req, res) => {
-  const { rows } = await createGame();
   console.log(req.userData);
+  const { rows } = await createGame(req.userData.id);
   res.send(rows[0]);
 })
 
@@ -35,12 +35,11 @@ app.post('/game/:id/user', async (req, res) => {
 })
 
 app.post('/login', async (req, res) => {
-  console.log(req.body);
   const username = req.body.username;
   const password = req.body.password;
-  const users = new Users();
+  const userService = new UserService();
   try {
-    const token = await users.login(username, password);
+    const token = await userService.login(username, password);
     res.send({ token });
   } catch (e) {
     res.send({

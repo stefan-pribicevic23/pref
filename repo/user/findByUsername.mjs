@@ -3,7 +3,7 @@ import { query } from '../../db/connPool.mjs';
 
 export default async function findByUsername(username) {
   const q = sql`
-      SELECT username, password
+      SELECT *
       FROM users
       WHERE username=${username}
     `;

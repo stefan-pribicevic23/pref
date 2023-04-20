@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import findByUsername from '../repo/user/findByUsername.mjs'
 
-export default class Users {
+export default class UserService {
   login = async (username, password) => {
     const user = await findByUsername(username);
     if (!user) {
@@ -12,6 +12,6 @@ export default class Users {
       throw new Error('Incorrect password');
     }
 
-    return jwt.sign({ username }, 'my_top_secret_key');
+    return jwt.sign({ username, id: user.id }, 'my_top_secret_key', { expiresIn: '30d' });
   }
 }
