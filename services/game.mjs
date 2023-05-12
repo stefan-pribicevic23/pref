@@ -22,6 +22,8 @@ export default class GameService {
       await addPlayer2(gameId, userId);
       const wsService = new WebSocketService();
       wsService.broadcastMessage('Game has started');
+      wsService.broadcastMessage('Lititation has started');
+      wsService.sendMessage('Licitiraj', game.admin);
       return;
     }
 

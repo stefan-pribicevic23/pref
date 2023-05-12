@@ -57,22 +57,23 @@ app.post('/login', async (req, res) => {
 })
 
 app.ws('/', (ws, req) => {
-  ws.on('connect', () => {
-    ws.id = req.userData.id;
-  })
-
   ws.on('message', (msg) => {
-    console.log(msg);
-    aWss.getWss('/').clients.forEach((client) => {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(`${req.userData.username} says: ${msg}`);
-        console.log(req.userData);
-      }
-    })
+    // console.log(msg);
+    // aWss.getWss('/').clients.forEach((client) => {
+    //   console.log(client.id);
+    //   console.log(ws.id);
+    //   if (client !== ws && client.readyState === WebSocket.OPEN) {
+    //     client.send(`${req.userData.username} says: ${msg}`);
+    //     console.log(req.userData);
+    //   }
+    // })
   })
 
-  console.log('new socket has opened');
-  ws.send('server says hi')
+  ws.id = req.userData.id;
+
+  aWss.getWss('/').clients.forEach(function each(client) {
+    console.log('Client.ID: ' + client.id);
+  });
 
   ws.on('close', () => {
     console.log('socket closed');
