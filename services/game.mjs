@@ -1,6 +1,7 @@
 import getGame from '../repo/game/getGame.mjs';
 import addPlayer1 from '../repo/game/addPlayer1.mjs';
 import addPlayer2 from '../repo/game/addPlayer2.mjs';
+import WebSocketService from './ws.mjs';
 
 export default class GameService {
   async addUser(gameId, userId) {
@@ -19,6 +20,8 @@ export default class GameService {
         throw new Error('User already joined the game.');
       }
       await addPlayer2(gameId, userId);
+      const wsService = new WebSocketService();
+      wsService.broadcastMessage('Game has started');
       return;
     }
 

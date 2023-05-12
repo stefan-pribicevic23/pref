@@ -7,10 +7,18 @@ import createGame from './repo/game/createGame.mjs';
 import { authMiddelware } from './middleware/auth.mjs';
 import UserService from './services/users.mjs';
 import GameService from './services/game.mjs';
+import expressWs from 'express-ws';
+import WebSocket from 'ws';
+import WebSocketService from './services/ws.mjs';
 
 const PORT = 4008;
 
 const app = express();
+const server = http.createServer(app);
+const aWss = expressWs(app, server);
+
+WebSocketService.ws = aWss;
+
 app.use(cors(), bodyParser.json());
 
 app.use(authMiddelware);
@@ -48,7 +56,28 @@ app.post('/login', async (req, res) => {
   }
 })
 
-const server = http.createServer(app);
+app.ws('/', (ws, req) => {
+  ws.on('connect', () => {
+    ws.id = req.userData.id;
+  })
+
+  ws.on('message', (msg) => {
+    console.log(msg);
+    aWss.getWss('/').clients.forEach((client) => {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(`${req.userData.username} says: ${msg}`);
+        console.log(req.userData);
+      }
+    })
+  })
+
+  console.log('new socket has opened');
+  ws.send('server says hi')
+
+  ws.on('close', () => {
+    console.log('socket closed');
+  })
+});
 
 server.listen(PORT);
 console.log(`Server listening on port ${PORT}`);
